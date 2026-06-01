@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Литовский язык — карточки</title>
+  <title>Lietuvių kalba</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
   <style>
     :root {
@@ -334,33 +334,79 @@
       display: flex; align-items: center; justify-content: center; gap: 7px;
     }
   
-.topic-select{
+.topic-dropdown{
+position:relative;
+}
+
+.topic-button{
 width:100%;
-padding:12px 14px;
-border-radius:12px;
-border:1px solid #2563EB;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 16px;
+border:none;
+border-radius:16px;
 background:#2563EB;
 color:white;
-font-size:14px;
+font-size:15px;
 font-weight:600;
-appearance:none;
--webkit-appearance:none;
+cursor:pointer;
 }
-.topic-select option{
+
+.topic-menu{
+display:none;
+position:absolute;
+top:100%;
+left:0;
+right:0;
+margin-top:8px;
 background:white;
-color:black;
+border-radius:16px;
+box-shadow:0 8px 30px rgba(0,0,0,.15);
+overflow:hidden;
+z-index:100;
+max-height:350px;
+overflow-y:auto;
+}
+
+.topic-menu.open{
+display:block;
+}
+
+.topic-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 16px;
+cursor:pointer;
+border-bottom:1px solid #eee;
+}
+
+.topic-item:hover{
+background:#f5f7ff;
+}
+
+.topic-left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.topic-count{
+font-size:12px;
+color:#666;
 }
 
 </style>
 </head>
 <body>
 <div class="app">
-  <h2 class="sr-only">Литовский язык — карточки с облачным сохранением</h2>
+  <h2 class="sr-only">Lietuvių kalba</h2>
 
   <!-- MAIN SCREEN -->
   <div class="screen active" id="screen-main">
     <div class="header">
-      <span class="header-title">Литовский язык</span>
+      <span class="header-title">Lietuvių kalba</span>
       <div class="stats-row">
         <span class="stat-pill stat-l" id="stat-l">— учу</span>
         <span class="stat-pill stat-k" id="stat-k">— знаю</span>
@@ -370,7 +416,20 @@ color:black;
 
     <div class="sync-status" id="sync-status"></div>
 
-    <div style="padding:0.75rem 1rem 0.5rem;"><select id="topic-select" class="topic-select"></select></div>
+    <div style="padding:0.75rem 1rem 0.5rem;">
+
+  <div class="topic-dropdown">
+
+    <button id="topic-button" class="topic-button">
+      <span id="topic-button-text">📚 Все темы</span>
+      <span>▼</span>
+    </button>
+
+    <div id="topic-menu" class="topic-menu"></div>
+
+  </div>
+
+</div>
 
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
@@ -646,16 +705,83 @@ function toggleMode() {
   document.getElementById('login-err').textContent = '';
 }
 
-function renderTopics() {
-  const sel=document.getElementById('topic-select');
-  if(sel){
-    sel.innerHTML = TOPICS.map(t=>{
-      const total=t==='Все'?WORDS.length:WORDS.filter(w=>w.topic===t).length;
-      const learned=t==='Все'?WORDS.filter(w=>known[w.lt]).length:WORDS.filter(w=>w.topic===t && known[w.lt]).length;
-      return `<option value="${t}" ${t===currentTopic?'selected':''}>${t} (${learned}/${total})</option>`;
-    }).join('');
-    return;
-  }
+function renderTopics(){
+
+  const menu = document.getElementById('topic-menu');
+
+  if(!menu) return;
+
+  const icons = {
+    "Все":"📚",
+    "Приветствия":"👋",
+    "Устойчивые выражения":"💬",
+    "Местоимения":"🧑",
+    "Вопросы":"❓",
+    "Глаголы":"🏃",
+    "Существительные":"📖",
+    "Семья":"👨‍👩‍👧",
+    "Дни недели":"📅",
+    "Месяцы":"🗓️",
+    "Поры года":"🌦️",
+    "Транспорт":"🚌",
+    "Город":"🏙️",
+    "Еда":"🍽️",
+    "Профессии":"💼",
+    "Числа":"🔢",
+    "Прилагательные":"🎨"
+  };
+
+  menu.innerHTML='';
+
+  TOPICS.forEach(topic=>{
+
+    const total =
+      topic==="Все"
+      ? WORDS.length
+      : WORDS.filter(w=>w.topic===topic).length;
+
+    const learned =
+      topic==="Все"
+      ? WORDS.filter(w=>known[w.lt]).length
+      : WORDS.filter(
+          w=>w.topic===topic && known[w.lt]
+        ).length;
+
+    const item=document.createElement('div');
+
+    item.className='topic-item';
+
+    item.innerHTML=
+    `
+      <div class="topic-left">
+        <span>${icons[topic] || '📘'}</span>
+        <span>${topic}</span>
+      </div>
+
+      <div class="topic-count">
+        ${learned}/${total}
+      </div>
+    `;
+
+    item.onclick=()=>{
+
+      currentTopic=topic;
+
+      document.getElementById(
+        'topic-button-text'
+      ).textContent=
+      `${icons[topic] || '📘'} ${topic}`;
+
+      menu.classList.remove('open');
+
+      idx=0;
+      flipped=false;
+
+      refresh();
+    };
+
+    menu.appendChild(item);
+  });
 }
 
 function setTopic(t, btn) {
@@ -801,13 +927,26 @@ document.getElementById('login-pass').addEventListener('keydown', e => { if (e.k
 document.getElementById('login-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
 
 
-document.addEventListener('change', function(e){
- if(e.target && e.target.id==='topic-select'){
-   currentTopic=e.target.value;
-   idx=0;
-   flipped=false;
-   refresh();
- }
+document
+.getElementById('topic-button')
+.addEventListener('click',()=>{
+
+  document
+  .getElementById('topic-menu')
+  .classList.toggle('open');
+
+});
+
+document.addEventListener('click',(e)=>{
+
+  if(!e.target.closest('.topic-dropdown')){
+
+    document
+    .getElementById('topic-menu')
+    .classList.remove('open');
+
+  }
+
 });
 refresh();
 </script>
