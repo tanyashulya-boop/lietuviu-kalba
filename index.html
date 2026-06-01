@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Lietuvių kalba</title>
+  <title>Литовский язык — карточки</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
   <style>
     :root {
@@ -333,16 +333,34 @@
       touch-action: manipulation; font-family: inherit; min-height: 52px;
       display: flex; align-items: center; justify-content: center; gap: 7px;
     }
-  </style>
+  
+.topic-select{
+width:100%;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #2563EB;
+background:#2563EB;
+color:white;
+font-size:14px;
+font-weight:600;
+appearance:none;
+-webkit-appearance:none;
+}
+.topic-select option{
+background:white;
+color:black;
+}
+
+</style>
 </head>
 <body>
 <div class="app">
-  <h2 class="sr-only">Lietuvių kalba с облачным сохранением</h2>
+  <h2 class="sr-only">Литовский язык — карточки с облачным сохранением</h2>
 
   <!-- MAIN SCREEN -->
   <div class="screen active" id="screen-main">
     <div class="header">
-      <span class="header-title">Lietuvių kalba</span>
+      <span class="header-title">Литовский язык</span>
       <div class="stats-row">
         <span class="stat-pill stat-l" id="stat-l">— учу</span>
         <span class="stat-pill stat-k" id="stat-k">— знаю</span>
@@ -352,10 +370,7 @@
 
     <div class="sync-status" id="sync-status"></div>
 
-    <div style="padding:0.75rem 1rem 0.5rem;">
-<select id="topic-select" style="width:100%;padding:12px;border-radius:10px;font-size:14px;">
-</select>
-</div>
+    <div style="padding:0.75rem 1rem 0.5rem;"><select id="topic-select" class="topic-select"></select></div>
 
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
@@ -632,13 +647,15 @@ function toggleMode() {
 }
 
 function renderTopics() {
-  const grid = document.getElementById('topic-grid');
-  grid.innerHTML = TOPICS.map(t => {
-    const cnt = t === 'Все' ? WORDS.length : WORDS.filter(w => w.topic === t).length;
-    const knownCnt = t === 'Все' ? WORDS.filter(w => known[w.lt]).length : WORDS.filter(w => w.topic === t && known[w.lt]).length;
-    const active = t === currentTopic ? ' active' : '';
-    return `<button class="topic-btn${active}" onclick="setTopic('${t.replace(/'/g, "\\'")}',this)">${t}<span class="t-cnt">${knownCnt}/${cnt}</span></button>`;
-  }).join('');
+  const sel=document.getElementById('topic-select');
+  if(sel){
+    sel.innerHTML = TOPICS.map(t=>{
+      const total=t==='Все'?WORDS.length:WORDS.filter(w=>w.topic===t).length;
+      const learned=t==='Все'?WORDS.filter(w=>known[w.lt]).length:WORDS.filter(w=>w.topic===t && known[w.lt]).length;
+      return `<option value="${t}" ${t===currentTopic?'selected':''}>${t} (${learned}/${total})</option>`;
+    }).join('');
+    return;
+  }
 }
 
 function setTopic(t, btn) {
@@ -784,21 +801,15 @@ document.getElementById('login-pass').addEventListener('keydown', e => { if (e.k
 document.getElementById('login-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
 
 
-function renderTopics() {
-  const sel = document.getElementById('topic-select');
-  if(!sel) return;
-  sel.innerHTML = TOPICS.map(t => `<option value="${t}" ${t===currentTopic?'selected':''}>${t}</option>`).join('');
-}
 document.addEventListener('change', function(e){
-  if(e.target && e.target.id==='topic-select'){
-    currentTopic = e.target.value;
-    idx = 0;
-    flipped = false;
-    refresh();
-  }
+ if(e.target && e.target.id==='topic-select'){
+   currentTopic=e.target.value;
+   idx=0;
+   flipped=false;
+   refresh();
+ }
 });
 refresh();
-
 </script>
 </body>
 </html>
