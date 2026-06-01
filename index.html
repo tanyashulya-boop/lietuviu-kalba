@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Lietuvių kalba</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      --color-text-primary: #111827;
+      --color-text-secondary: #6B7280;
+      --color-text-tertiary: #9CA3AF;
+      --color-text-info: #1D4ED8;
+      --color-text-success: #15803D;
+      --color-text-danger: #DC2626;
+      --color-background-primary: #FFFFFF;
+      --color-background-secondary: #F3F4F6;
+      --color-background-info: #EFF6FF;
+      --color-background-danger: #FEF2F2;
+      --color-background-success: #F0FDF4;
+      --color-border-primary: #374151;
+      --color-border-secondary: #D1D5DB;
+      --color-border-tertiary: #E5E7EB;
+      --color-border-danger: #FCA5A5;
+      --border-radius-md: 10px;
+      --border-radius-lg: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-text-primary: #F9FAFB;
+        --color-text-secondary: #D1D5DB;
+        --color-text-tertiary: #6B7280;
+        --color-text-info: #60A5FA;
+        --color-text-success: #4ADE80;
+        --color-text-danger: #F87171;
+        --color-background-primary: #1F2937;
+        --color-background-secondary: #111827;
+        --color-background-info: #1E3A5F;
+        --color-background-danger: #3B0D0D;
+        --color-background-success: #052E16;
+        --color-border-primary: #F9FAFB;
+        --color-border-secondary: #4B5563;
+        --color-border-tertiary: #374151;
+        --color-border-danger: #7F1D1D;
+      }
+      .stat-l { background: #1E3A5F !important; color: #93C5FD !important; }
+      .stat-k { background: #052E16 !important; color: #86EFAC !important; }
+      .btn-known { background: #052E16 !important; border-color: #166534 !important; color: #4ADE80 !important; }
+      .btn-unknown { background: #3B0D0D !important; border-color: #7F1D1D !important; color: #F87171 !important; }
+      .known-badge { background: #052E16 !important; color: #4ADE80 !important; }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0 }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Header ── */
+    .header {
+      padding: calc(0.75rem + env(safe-area-inset-top, 0px)) 1rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-background-primary);
+      border-bottom: 1px solid var(--color-border-tertiary);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); flex: 1; }
+
+    .stats-row { display: flex; gap: 5px; }
+
+    .stat-pill { font-size: 11px; padding: 4px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+    .stat-l { background: #E6F1FB; color: #0C447C; }
+    .stat-k { background: #EAF3DE; color: #27500A; }
+
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--color-background-info);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--color-text-info);
+      cursor: pointer; border: 1px solid var(--color-border-tertiary);
+      flex-shrink: 0; touch-action: manipulation;
+    }
+
+    /* ── Sync status ── */
+    .sync-status {
+      font-size: 11px; color: var(--color-text-tertiary);
+      padding: 4px 1rem;
+      display: flex; align-items: center; gap: 4px;
+      min-height: 22px;
+      background: var(--color-background-primary);
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+
+    /* ── Topic grid ── */
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 0.75rem 1rem 0.5rem;
+    }
+
+    .topic-btn {
+      padding: 10px 12px; border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-tertiary);
+      background: var(--color-background-primary);
+      color: var(--color-text-secondary);
+      font-size: 13px; cursor: pointer; text-align: left;
+      transition: background 0.15s, color 0.15s; line-height: 1.3;
+      touch-action: manipulation; font-family: inherit;
+    }
+    .topic-btn.active {
+      background: var(--color-text-primary);
+      color: var(--color-background-primary);
+      border-color: var(--color-text-primary);
+    }
+    .topic-btn .t-cnt { font-size: 10px; opacity: 0.65; display: block; margin-top: 2px; }
+
+    /* ── Filter row ── */
+    .filter-row {
+      display: flex; gap: 6px; padding: 0 1rem 0.5rem;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      font-size: 13px; padding: 7px 16px;
+      border-radius: 8px; border: 1px solid var(--color-border-tertiary);
+      background: var(--color-background-primary); color: var(--color-text-secondary);
+      cursor: pointer; transition: all 0.15s;
+      touch-action: manipulation; white-space: nowrap; flex-shrink: 0;
+      font-family: inherit;
+    }
+    .filter-btn.active {
+      border-color: var(--color-border-primary);
+      color: var(--color-text-primary); font-weight: 600;
+    }
+
+    /* ── Progress bar ── */
+    .prog-wrap { padding: 0 1rem 0.5rem; }
+    .prog-bg { height: 4px; background: var(--color-border-tertiary); border-radius: 2px; }
+    .prog-fill { height: 4px; background: var(--color-text-primary); border-radius: 2px; transition: width 0.3s; }
+    .prog-lbl { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+    /* ── Flashcard ── */
+    .card-area { padding: 0 1rem; perspective: 1000px; -webkit-perspective: 1000px; }
+
+    .card-wrap {
+      height: 230px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%; height: 100%;
+      transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+      transform-style: preserve-3d; -webkit-transform-style: preserve-3d; position: relative;
+    }
+    .card-inner.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--color-border-tertiary);
+      background: var(--color-background-primary);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .card-back { transform: rotateY(180deg); }
+
+    .c-lang {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--color-text-tertiary); margin-bottom: 8px;
+    }
+    .c-word { font-size: 26px; font-weight: 500; color: var(--color-text-primary); text-align: center; line-height: 1.25; }
+    .c-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 6px; text-align: center; font-style: italic; }
+    .c-hint { font-size: 11px; color: var(--color-text-tertiary); margin-top: 14px; }
+    .c-tag { font-size: 11px; padding: 3px 9px; border-radius: 5px; background: var(--color-background-secondary); color: var(--color-text-secondary); margin-top: 8px; }
+
+    .known-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-size: 11px; padding: 3px 8px; border-radius: 4px;
+      background: #EAF3DE; color: #27500A; font-weight: 500;
+    }
+    .sync-badge {
+      position: absolute; top: 12px; left: 12px;
+      font-size: 10px; padding: 3px 7px; border-radius: 4px;
+      background: #E6F1FB; color: #0C447C;
+    }
+
+    /* swipe visual feedback */
+    .card-wrap.swipe-left .card-inner { transform: translateX(-8px) rotate(-1deg); transition: transform 0.1s; }
+    .card-wrap.swipe-right .card-inner { transform: translateX(8px) rotate(1deg); transition: transform 0.1s; }
+
+    /* ── Actions ── */
+    .actions { display: flex; gap: 8px; padding: 0.75rem 1rem 0; }
+
+    .btn-a {
+      flex: 1; padding: 0 8px; border-radius: var(--border-radius-md);
+      font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid;
+      transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center;
+      gap: 6px; touch-action: manipulation; font-family: inherit;
+      min-height: 52px;
+    }
+    .btn-a:active { opacity: 0.75; transform: scale(0.97); }
+
+    .btn-skip {
+      background: var(--color-background-primary);
+      border-color: var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      flex: 0 0 52px;
+    }
+    .btn-known { background: #EAF3DE; border-color: #C0DD97; color: #27500A; }
+    .btn-unknown { background: #FAECE7; border-color: #F5C4B3; color: #712B13; }
+
+    /* ── Nav row ── */
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1rem 0;
+    }
+    .nav-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 1px solid var(--color-border-tertiary);
+      background: var(--color-background-primary); color: var(--color-text-secondary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: opacity 0.15s; touch-action: manipulation;
+    }
+    .nav-btn:active { opacity: 0.65; }
+    .nav-ctr { font-size: 13px; color: var(--color-text-secondary); }
+
+    .swipe-hint {
+      text-align: center; font-size: 11px; color: var(--color-text-tertiary);
+      padding: 6px 0 0;
+    }
+
+    /* ── Login screen ── */
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 14px; color: var(--color-text-secondary); cursor: pointer;
+      padding: 0.75rem 1rem; background: none; border: none;
+      touch-action: manipulation; font-family: inherit; min-height: 52px;
+    }
+
+    .login-wrap { padding: 0 1rem 1rem; }
+
+    .login-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg); padding: 1.5rem;
+    }
+    .login-title { font-size: 18px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px; }
+    .login-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.25rem; line-height: 1.5; }
+    .login-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; display: block; }
+    .login-input {
+      width: 100%; margin-bottom: 12px;
+      font-size: 16px; /* 16px prevents iOS zoom on focus */
+      padding: 11px 14px; border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      background: var(--color-background-primary); color: var(--color-text-primary);
+      font-family: inherit; outline: none; transition: border-color 0.15s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .login-input:focus { border-color: var(--color-border-primary); }
+    .login-btn {
+      width: 100%; padding: 13px; border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-secondary);
+      background: var(--color-text-primary); color: var(--color-background-primary);
+      font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 4px;
+      touch-action: manipulation; font-family: inherit; min-height: 52px;
+    }
+    .login-err { font-size: 13px; color: var(--color-text-danger); margin-top: 8px; min-height: 20px; }
+    .login-toggle { font-size: 13px; color: var(--color-text-secondary); margin-top: 14px; text-align: center; }
+    .login-toggle span { color: var(--color-text-info); cursor: pointer; }
+
+    /* ── Profile screen ── */
+    .profile-wrap { padding: 0 1rem 1rem; }
+
+    .profile-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 12px;
+    }
+    .profile-row { display: flex; align-items: center; gap: 14px; margin-bottom: 1rem; }
+    .profile-av {
+      width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0;
+      background: var(--color-background-info);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; color: var(--color-text-info);
+    }
+    .profile-name { font-size: 16px; font-weight: 600; color: var(--color-text-primary); }
+    .profile-id { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .stat-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+    .stat-num { font-size: 24px; font-weight: 600; color: var(--color-text-primary); }
+    .stat-lbl { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+    .logout-btn {
+      width: 100%; padding: 13px; border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-danger);
+      background: var(--color-background-danger); color: var(--color-text-danger);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      touch-action: manipulation; font-family: inherit; min-height: 52px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h2 class="sr-only">Lietuvių kalba с облачным сохранением</h2>
+
+  <!-- MAIN SCREEN -->
+  <div class="screen active" id="screen-main">
+    <div class="header">
+      <span class="header-title">Lietuvių kalba</span>
+      <div class="stats-row">
+        <span class="stat-pill stat-l" id="stat-l">— учу</span>
+        <span class="stat-pill stat-k" id="stat-k">— знаю</span>
+      </div>
+      <div class="avatar" id="avatar-btn" onclick="showProfile()" title="Профиль / вход">?</div>
+    </div>
+
+    <div class="sync-status" id="sync-status"></div>
+
+    <div style="padding:0.75rem 1rem 0.5rem;">
+<select id="topic-select" style="width:100%;padding:12px;border-radius:10px;font-size:14px;">
+</select>
+</div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
+      <button class="filter-btn" onclick="setFilter('learning',this)">Учу</button>
+      <button class="filter-btn" onclick="setFilter('known',this)">Знаю</button>
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-lbl" id="prog-lbl"></div>
+    </div>
+
+    <div class="card-area">
+      <div class="card-wrap" id="card-wrap">
+        <div class="card-inner" id="card-inner">
+          <div class="card-face card-front">
+            <span class="c-lang">Литовский</span>
+            <div class="c-word" id="w-lt"></div>
+            <div class="c-sub" id="w-forms"></div>
+            <span class="c-tag" id="w-tag"></span>
+            <span class="c-hint">нажмите, чтобы перевернуть</span>
+          </div>
+          <div class="card-face card-back">
+            <span class="c-lang">Русский</span>
+            <div class="c-word" id="w-ru"></div>
+            <div class="c-sub" id="w-ru-sub"></div>
+            <span class="c-tag" id="w-tag2"></span>
+            <div id="known-badge"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-a btn-unknown" onclick="markCard(false)"><i class="ti ti-x" aria-hidden="true"></i>Не знаю</button>
+      <button class="btn-a btn-skip" onclick="nextCard()" aria-label="Следующая"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+      <button class="btn-a btn-known" onclick="markCard(true)"><i class="ti ti-check" aria-hidden="true"></i>Знаю</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="prevCard()" aria-label="Назад"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <span class="nav-ctr" id="nav-ctr">— / —</span>
+      <button class="nav-btn" onclick="nextCard()" aria-label="Вперёд"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="swipe-hint">← смахните для перехода →</div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen" id="screen-login">
+    <button class="back-btn" onclick="showScreen('main')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Назад</button>
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-title" id="login-title">Вход</div>
+        <div class="login-sub" id="login-sub">Прогресс сохраняется в облаке — у каждого пользователя свой результат</div>
+        <label class="login-label" for="login-name">Имя пользователя</label>
+        <input class="login-input" type="text" id="login-name" placeholder="например: anna" autocomplete="username">
+        <label class="login-label" for="login-pass">Пароль</label>
+        <input class="login-input" type="password" id="login-pass" placeholder="минимум 4 символа" autocomplete="current-password">
+        <div class="login-err" id="login-err"></div>
+        <button class="login-btn" id="login-submit" onclick="doAuth()">Войти</button>
+        <div class="login-toggle" id="login-toggle">Нет аккаунта? <span onclick="toggleMode()">Зарегистрироваться</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE SCREEN -->
+  <div class="screen" id="screen-profile">
+    <button class="back-btn" onclick="showScreen('main')"><i class="ti ti-arrow-left" aria-hidden="true"></i> К карточкам</button>
+    <div class="profile-wrap">
+      <div class="profile-card">
+        <div class="profile-row">
+          <div class="profile-av" id="prof-av"></div>
+          <div>
+            <div class="profile-name" id="prof-name"></div>
+            <div class="profile-id" id="prof-id"></div>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-num" id="prof-known">0</div><div class="stat-lbl">изучено слов</div></div>
+          <div class="stat-box"><div class="stat-num" id="prof-total">0</div><div class="stat-lbl">всего слов</div></div>
+          <div class="stat-box"><div class="stat-num" id="prof-pct">0%</div><div class="stat-lbl">прогресс</div></div>
+          <div class="stat-box"><div class="stat-num" id="prof-topics">0</div><div class="stat-lbl">тем пройдено</div></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()"><i class="ti ti-logout" aria-hidden="true"></i> Выйти из аккаунта</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── localStorage-based storage (cloud sync can be layered on top) ──
+window.storage = {
+  async get(key) {
+    try { const v = localStorage.getItem(key); return v ? { value: v } : null; }
+    catch(e) { return null; }
+  },
+  async set(key, value) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+};
+
+const WORDS = [
+{lt:'labas',ru:'привет',topic:'Приветствия'},{lt:'labas rytas',ru:'доброе утро',topic:'Приветствия'},{lt:'laba diena',ru:'добрый день',topic:'Приветствия'},{lt:'labas vakaras',ru:'добрый вечер',topic:'Приветствия'},{lt:'labanakt',ru:'спокойной ночи',topic:'Приветствия'},{lt:'sveikas',ru:'здравствуй (муж.)',topic:'Приветствия'},{lt:'sveika',ru:'здравствуй (жен.)',topic:'Приветствия'},{lt:'sveiki',ru:'здравствуйте',topic:'Приветствия'},{lt:'viso gero',ru:'до свидания',topic:'Приветствия'},{lt:'sudiev',ru:'прощай',topic:'Приветствия'},{lt:'iki pasimatymo',ru:'до встречи',topic:'Приветствия'},{lt:'iki',ru:'пока',topic:'Приветствия'},{lt:'ačiū',ru:'спасибо',topic:'Приветствия'},{lt:'labai ačiū',ru:'большое спасибо',topic:'Приветствия'},{lt:'prašom',ru:'пожалуйста',topic:'Приветствия'},{lt:'nėra už ką',ru:'не за что',topic:'Приветствия'},{lt:'atsiprašau',ru:'извините',topic:'Приветствия'},{lt:'nieko tokio',ru:'ничего страшного',topic:'Приветствия'},{lt:'labai malonu',ru:'очень приятно',topic:'Приветствия'},{lt:'man taip pat',ru:'мне тоже',topic:'Приветствия'},
+{lt:'kaip jums sekasi?',ru:'как у вас дела?',topic:'Устойчивые выражения'},{lt:'kaip tau sekasi?',ru:'как у тебя дела?',topic:'Устойчивые выражения'},{lt:'ačiū, gerai',ru:'спасибо, хорошо',topic:'Устойчивые выражения'},{lt:'neblogai',ru:'неплохо',topic:'Устойчивые выражения'},{lt:'taip',ru:'да',topic:'Устойчивые выражения'},{lt:'ne',ru:'нет',topic:'Устойчивые выражения'},{lt:'aišku',ru:'понятно',topic:'Устойчивые выражения'},{lt:'viskas',ru:'всё',topic:'Устойчивые выражения'},{lt:'žinoma',ru:'конечно',topic:'Устойчивые выражения'},{lt:'gerai',ru:'хорошо / ладно',topic:'Устойчивые выражения'},{lt:'į sveikatą',ru:'на здоровье',topic:'Устойчивые выражения'},{lt:'skanaus',ru:'приятного аппетита',topic:'Устойчивые выражения'},{lt:'gero savaitgalio',ru:'хороших выходных',topic:'Устойчивые выражения'},{lt:'sėkmės',ru:'удачи',topic:'Устойчивые выражения'},{lt:'laimingos kelionės',ru:'счастливого пути',topic:'Устойчивые выражения'},{lt:'gero vakaro',ru:'хорошего вечера',topic:'Устойчивые выражения'},{lt:'einam kartu',ru:'пойдём вместе',topic:'Устойчивые выражения'},{lt:'truputį',ru:'немного',topic:'Устойчивые выражения'},{lt:'daug',ru:'много',topic:'Устойчивые выражения'},{lt:'mažai',ru:'мало',topic:'Устойчивые выражения'},{lt:'kiek',ru:'сколько',topic:'Устойчивые выражения'},
+{lt:'aš',ru:'я',topic:'Местоимения'},{lt:'tu',ru:'ты',topic:'Местоимения'},{lt:'jis',ru:'он',topic:'Местоимения'},{lt:'ji',ru:'она',topic:'Местоимения'},{lt:'mes',ru:'мы',topic:'Местоимения'},{lt:'jūs',ru:'вы',topic:'Местоимения'},{lt:'jie',ru:'они (муж.)',topic:'Местоимения'},{lt:'jos',ru:'они (жен.)',topic:'Местоимения'},{lt:'mano',ru:'мой / моя / моё / мои',topic:'Местоимения'},{lt:'tavo',ru:'твой / твоя / твоё / твои',topic:'Местоимения'},{lt:'jo',ru:'его',topic:'Местоимения'},{lt:'jos (притяж.)',ru:'её',topic:'Местоимения'},{lt:'mūsų',ru:'наш / наша / наши',topic:'Местоимения'},{lt:'jūsų',ru:'ваш / ваша / ваши',topic:'Местоимения'},{lt:'jų',ru:'их',topic:'Местоимения'},{lt:'šis',ru:'этот (муж.)',topic:'Местоимения'},{lt:'ši',ru:'эта (жен.)',topic:'Местоимения'},
+{lt:'kas?',ru:'кто? / что?',topic:'Вопросы'},{lt:'kaip?',ru:'как? / на каком языке?',topic:'Вопросы'},{lt:'koks? / kokia?',ru:'какой? / какая?',topic:'Вопросы'},{lt:'ar?',ru:'ли? (вопрос да/нет)',topic:'Вопросы'},{lt:'kur?',ru:'где?',topic:'Вопросы'},{lt:'iš kur?',ru:'откуда?',topic:'Вопросы'},{lt:'ką?',ru:'кого? / что? (вин.)',topic:'Вопросы'},{lt:'ko?',ru:'чего? / откуда? (род.)',topic:'Вопросы'},{lt:'kam?',ru:'кому?',topic:'Вопросы'},{lt:'kada?',ru:'когда?',topic:'Вопросы'},{lt:'kelintas? / kelinta?',ru:'который / которая по счёту?',topic:'Вопросы'},{lt:'kiek?',ru:'сколько?',topic:'Вопросы'},{lt:'ką veiki?',ru:'что ты делаешь?',topic:'Вопросы'},
+{lt:'būti',ru:'быть',sub:'yra / buvo',topic:'Глаголы'},{lt:'dirbti',ru:'работать',sub:'dirba / dirbo',topic:'Глаголы'},{lt:'kalbėti',ru:'говорить',sub:'kalba / kalbėjo',topic:'Глаголы'},{lt:'studijuoti',ru:'учиться',sub:'studijuoja / studijavo',topic:'Глаголы'},{lt:'suprasti',ru:'понимать',sub:'supranta / suprato',topic:'Глаголы'},{lt:'gyventi',ru:'жить',sub:'gyvena / gyveno',topic:'Глаголы'},{lt:'eiti',ru:'идти',sub:'eina / ėjo',topic:'Глаголы'},{lt:'važiuoti',ru:'ехать / ездить',sub:'važiuoja / važiavo',topic:'Глаголы'},{lt:'norėti',ru:'хотеть',sub:'nori / norėjo',topic:'Глаголы'},{lt:'galėti',ru:'мочь',sub:'gali / galėjo',topic:'Глаголы'},{lt:'turėti',ru:'иметь',sub:'turi / turėjo',topic:'Глаголы'},{lt:'mėgti',ru:'любить (вещи)',sub:'mėgsta / mėgo',topic:'Глаголы'},{lt:'mylėti',ru:'любить (людей)',sub:'myli / mylėjo',topic:'Глаголы'},{lt:'valgyti',ru:'есть / кушать',sub:'valgo / valgė',topic:'Глаголы'},{lt:'gerti',ru:'пить',sub:'geria / gėrė',topic:'Глаголы'},{lt:'pirkti',ru:'покупать',sub:'perka / pirko',topic:'Глаголы'},{lt:'patikti',ru:'нравиться',sub:'patinka / patiko',topic:'Глаголы'},{lt:'laukti',ru:'ждать',sub:'laukia / laukė',topic:'Глаголы'},{lt:'reikėti',ru:'надо / нуждаться',sub:'reikia / reikėjo',topic:'Глаголы'},{lt:'susipažinti',ru:'познакомиться',sub:'susipažįsta / susipažino',topic:'Глаголы'},{lt:'duoti',ru:'дать',sub:'duoda / davė',topic:'Глаголы'},{lt:'imti',ru:'брать',sub:'ima / ėmė',topic:'Глаголы'},{lt:'kepti',ru:'жарить',sub:'kepa / kepė',topic:'Глаголы'},{lt:'virti',ru:'варить',sub:'verda / virė',topic:'Глаголы'},{lt:'mokėti',ru:'платить',sub:'moka / mokėjo',topic:'Глаголы'},{lt:'pietauti',ru:'обедать',sub:'pietauja / pietavo',topic:'Глаголы'},{lt:'žaisti',ru:'играть',sub:'žaidžia / žaidė',topic:'Глаголы'},{lt:'skristi',ru:'летать',sub:'skrenda / skrido',topic:'Глаголы'},{lt:'plaukti',ru:'плыть',sub:'plaukia / plaukė',topic:'Глаголы'},{lt:'sustoti',ru:'остановиться',sub:'sustoja / sustojo',topic:'Глаголы'},{lt:'susitikti',ru:'встретиться',sub:'susitinka / susitiko',topic:'Глаголы'},{lt:'lyti',ru:'идти (о дожде)',sub:'lyja / lijo',topic:'Глаголы'},{lt:'snigti',ru:'идти (о снеге)',sub:'sninga / snigo',topic:'Глаголы'},{lt:'šviesti',ru:'светить',sub:'šviečia / švietė',topic:'Глаголы'},{lt:'pūsti',ru:'дуть',sub:'pučia / pūtė',topic:'Глаголы'},{lt:'pradėti',ru:'начать',sub:'pradeda / pradėjo',topic:'Глаголы'},{lt:'atostogauti',ru:'быть в отпуске',sub:'atostogauja / atostogavo',topic:'Глаголы'},
+{lt:'žmogus',ru:'человек',topic:'Существительные'},{lt:'vyras',ru:'мужчина / муж',topic:'Существительные'},{lt:'moteris',ru:'женщина',topic:'Существительные'},{lt:'mergina',ru:'девушка',topic:'Существительные'},{lt:'vaikinas',ru:'парень',topic:'Существительные'},{lt:'berniukas',ru:'мальчик',topic:'Существительные'},{lt:'mergaitė',ru:'девочка',topic:'Существительные'},{lt:'vaikas',ru:'ребёнок',topic:'Существительные'},{lt:'kūdikis',ru:'младенец',topic:'Существительные'},{lt:'ponas',ru:'господин',topic:'Существительные'},{lt:'ponia',ru:'госпожа',topic:'Существительные'},{lt:'vardas',ru:'имя',topic:'Существительные'},{lt:'pavardė',ru:'фамилия',topic:'Существительные'},{lt:'adresas',ru:'адрес',topic:'Существительные'},{lt:'telefonas',ru:'телефон',topic:'Существительные'},
+{lt:'šeima',ru:'семья',topic:'Семья'},{lt:'tėvas',ru:'отец',topic:'Семья'},{lt:'mama',ru:'мама',topic:'Семья'},{lt:'sūnus',ru:'сын',topic:'Семья'},{lt:'dukra',ru:'дочь',topic:'Семья'},{lt:'brolis',ru:'брат',topic:'Семья'},{lt:'sesuo',ru:'сестра',topic:'Семья'},{lt:'žmona',ru:'жена',topic:'Семья'},{lt:'dėdė',ru:'дядя',topic:'Семья'},{lt:'teta',ru:'тётя',topic:'Семья'},{lt:'anūkas',ru:'внук',topic:'Семья'},{lt:'anūkė',ru:'внучка',topic:'Семья'},{lt:'senelis',ru:'дедушка',topic:'Семья'},{lt:'senelė',ru:'бабушка',topic:'Семья'},{lt:'pusbrolis',ru:'двоюродный брат',topic:'Семья'},{lt:'pusseserė',ru:'двоюродная сестра',topic:'Семья'},
+{lt:'pirmadienis',ru:'понедельник',topic:'Дни недели'},{lt:'antradienis',ru:'вторник',topic:'Дни недели'},{lt:'trečiadienis',ru:'среда',topic:'Дни недели'},{lt:'ketvirtadienis',ru:'четверг',topic:'Дни недели'},{lt:'penktadienis',ru:'пятница',topic:'Дни недели'},{lt:'šeštadienis',ru:'суббота',topic:'Дни недели'},{lt:'sekmadienis',ru:'воскресенье',topic:'Дни недели'},{lt:'savaitgalis',ru:'выходные',topic:'Дни недели'},{lt:'savaitė',ru:'неделя',topic:'Дни недели'},
+{lt:'sausis',ru:'январь',topic:'Месяцы'},{lt:'vasaris',ru:'февраль',topic:'Месяцы'},{lt:'kovas',ru:'март',topic:'Месяцы'},{lt:'balandis',ru:'апрель',topic:'Месяцы'},{lt:'gegužė',ru:'май',topic:'Месяцы'},{lt:'birželis',ru:'июнь',topic:'Месяцы'},{lt:'liepa',ru:'июль',topic:'Месяцы'},{lt:'rugpjūtis',ru:'август',topic:'Месяцы'},{lt:'rugsėjis',ru:'сентябрь',topic:'Месяцы'},{lt:'spalis',ru:'октябрь',topic:'Месяцы'},{lt:'lapkritis',ru:'ноябрь',topic:'Месяцы'},{lt:'gruodis',ru:'декабрь',topic:'Месяцы'},{lt:'mėnuo',ru:'месяц',topic:'Месяцы'},
+{lt:'pavasaris',ru:'весна',topic:'Поры года'},{lt:'vasara',ru:'лето',topic:'Поры года'},{lt:'ruduo',ru:'осень',topic:'Поры года'},{lt:'žiema',ru:'зима',topic:'Поры года'},{lt:'oras',ru:'погода',topic:'Поры года'},{lt:'saulė',ru:'солнце',topic:'Поры года'},{lt:'lietus',ru:'дождь',topic:'Поры года'},{lt:'sniegas',ru:'снег',topic:'Поры года'},{lt:'vėjas',ru:'ветер',topic:'Поры года'},{lt:'debesys',ru:'облака',topic:'Поры года'},{lt:'karšta',ru:'жарко',topic:'Поры года'},{lt:'šalta',ru:'холодно',topic:'Поры года'},{lt:'šilta',ru:'тепло',topic:'Поры года'},{lt:'diena',ru:'день',topic:'Поры года'},{lt:'naktis',ru:'ночь',topic:'Поры года'},
+{lt:'autobusas',ru:'автобус',topic:'Транспорт'},{lt:'troleibusas',ru:'троллейбус',topic:'Транспорт'},{lt:'traukinys',ru:'поезд',topic:'Транспорт'},{lt:'lėktuvas',ru:'самолёт',topic:'Транспорт'},{lt:'laivas',ru:'корабль',topic:'Транспорт'},{lt:'keltas',ru:'паром',topic:'Транспорт'},{lt:'mašina',ru:'автомобиль',topic:'Транспорт'},{lt:'dviratis',ru:'велосипед',topic:'Транспорт'},{lt:'motociklas',ru:'мотоцикл',topic:'Транспорт'},{lt:'taksi',ru:'такси',topic:'Транспорт'},{lt:'stotelė',ru:'остановка',topic:'Транспорт'},{lt:'autobusų stotis',ru:'автовокзал',topic:'Транспорт'},{lt:'geležinkelio stotis',ru:'ж/д вокзал',topic:'Транспорт'},{lt:'oro uostas',ru:'аэропорт',topic:'Транспорт'},{lt:'bilietas',ru:'билет',topic:'Транспорт'},
+{lt:'namas',ru:'дом',topic:'Город и места'},{lt:'gatvė',ru:'улица',topic:'Город и места'},{lt:'aikštė',ru:'площадь',topic:'Город и места'},{lt:'parkas',ru:'парк',topic:'Город и места'},{lt:'bankas',ru:'банк',topic:'Город и места'},{lt:'parduotuvė',ru:'магазин',topic:'Город и места'},{lt:'restoranas',ru:'ресторан',topic:'Город и места'},{lt:'kavinė',ru:'кафе',topic:'Город и места'},{lt:'vaistinė',ru:'аптека',topic:'Город и места'},{lt:'ligoninė',ru:'больница',topic:'Город и места'},{lt:'mokykla',ru:'школа',topic:'Город и места'},{lt:'universitetas',ru:'университет',topic:'Город и места'},{lt:'teatras',ru:'театр',topic:'Город и места'},{lt:'muziejus',ru:'музей',topic:'Город и места'},{lt:'kino teatras',ru:'кинотеатр',topic:'Город и места'},{lt:'viešbutis',ru:'гостиница',topic:'Город и места'},{lt:'policija',ru:'полиция',topic:'Город и места'},
+{lt:'duona',ru:'хлеб',topic:'Еда'},{lt:'pienas',ru:'молоко',topic:'Еда'},{lt:'sūris',ru:'сыр',topic:'Еда'},{lt:'kiaušinis',ru:'яйцо',topic:'Еда'},{lt:'mėsa',ru:'мясо',topic:'Еда'},{lt:'žuvis',ru:'рыба',topic:'Еда'},{lt:'vištiena',ru:'курица',topic:'Еда'},{lt:'kiauliena',ru:'свинина',topic:'Еда'},{lt:'jautiena',ru:'говядина',topic:'Еда'},{lt:'obuolys',ru:'яблоко',topic:'Еда'},{lt:'bananas',ru:'банан',topic:'Еда'},{lt:'apelsinas',ru:'апельсин',topic:'Еда'},{lt:'braškė',ru:'клубника',topic:'Еда'},{lt:'bulvė',ru:'картофель',topic:'Еда'},{lt:'morka',ru:'морковь',topic:'Еда'},{lt:'agurkas',ru:'огурец',topic:'Еда'},{lt:'pomidoras',ru:'помидор',topic:'Еда'},{lt:'svogūnas',ru:'лук',topic:'Еда'},{lt:'kava',ru:'кофе',topic:'Еда'},{lt:'arbata',ru:'чай',topic:'Еда'},{lt:'vanduo',ru:'вода',topic:'Еда'},{lt:'sultys',ru:'сок',topic:'Еда'},{lt:'vynas',ru:'вино',topic:'Еда'},{lt:'alus',ru:'пиво',topic:'Еда'},{lt:'cukrus',ru:'сахар',topic:'Еда'},{lt:'druska',ru:'соль',topic:'Еда'},{lt:'cepelinai',ru:'цепелины',topic:'Еда'},{lt:'sriuba',ru:'суп',topic:'Еда'},{lt:'kepsnys',ru:'стейк / жаркое',topic:'Еда'},{lt:'tortas',ru:'торт',topic:'Еда'},{lt:'ledai',ru:'мороженое',topic:'Еда'},
+{lt:'gydytojas / gydytoja',ru:'врач',topic:'Профессии'},{lt:'mokytojas / mokytoja',ru:'учитель',topic:'Профессии'},{lt:'inžinierius / inžinierė',ru:'инженер',topic:'Профессии'},{lt:'direktorius / direktorė',ru:'директор',topic:'Профессии'},{lt:'žurnalistas / žurnalistė',ru:'журналист',topic:'Профессии'},{lt:'vairuotojas / vairuotoja',ru:'водитель',topic:'Профессии'},{lt:'vadybininkas / vadybininkė',ru:'менеджер',topic:'Профессии'},{lt:'studentas / studentė',ru:'студент',topic:'Профессии'},{lt:'mokinys / mokinė',ru:'школьник',topic:'Профессии'},{lt:'pardavėjas / pardavėja',ru:'продавец',topic:'Профессии'},{lt:'padavėjas / padavėja',ru:'официант',topic:'Профессии'},{lt:'policininkas / policininkė',ru:'полицейский',topic:'Профессии'},
+{lt:'nulis',ru:'ноль (0)',topic:'Числа'},{lt:'vienas / viena',ru:'один / одна (1)',topic:'Числа'},{lt:'du / dvi',ru:'два / две (2)',topic:'Числа'},{lt:'trys',ru:'три (3)',topic:'Числа'},{lt:'keturi / keturios',ru:'четыре (4)',topic:'Числа'},{lt:'penki / penkios',ru:'пять (5)',topic:'Числа'},{lt:'šeši / šešios',ru:'шесть (6)',topic:'Числа'},{lt:'septyni / septynios',ru:'семь (7)',topic:'Числа'},{lt:'aštuoni / aštuonios',ru:'восемь (8)',topic:'Числа'},{lt:'devyni / devynios',ru:'девять (9)',topic:'Числа'},{lt:'dešimt',ru:'десять (10)',topic:'Числа'},{lt:'vienuolika',ru:'одиннадцать (11)',topic:'Числа'},{lt:'dvylika',ru:'двенадцать (12)',topic:'Числа'},{lt:'dvidešimt',ru:'двадцать (20)',topic:'Числа'},{lt:'trisdešimt',ru:'тридцать (30)',topic:'Числа'},{lt:'šimtas',ru:'сто (100)',topic:'Числа'},{lt:'tūkstantis',ru:'тысяча (1000)',topic:'Числа'},
+{lt:'geras / gera',ru:'хороший / хорошая',topic:'Прилагательные'},{lt:'blogas / bloga',ru:'плохой / плохая',topic:'Прилагательные'},{lt:'didelis / didelė',ru:'большой / большая',topic:'Прилагательные'},{lt:'mažas / maža',ru:'маленький / маленькая',topic:'Прилагательные'},{lt:'gražus / graži',ru:'красивый / красивая',topic:'Прилагательные'},{lt:'karštas / karšta',ru:'горячий / горячая',topic:'Прилагательные'},{lt:'šaltas / šalta',ru:'холодный / холодная',topic:'Прилагательные'},{lt:'šiltas / šilta',ru:'тёплый / тёплая',topic:'Прилагательные'},{lt:'saldus / saldi',ru:'сладкий / сладкая',topic:'Прилагательные'},{lt:'rūgštus / rūgšti',ru:'кислый / кислая',topic:'Прилагательные'},{lt:'sūrus / sūri',ru:'солёный / солёная',topic:'Прилагательные'},{lt:'skanus / skani',ru:'вкусный / вкусная',topic:'Прилагательные'},{lt:'baltas / balta',ru:'белый / белая',topic:'Прилагательные'},{lt:'juodas / juoda',ru:'чёрный / чёрная',topic:'Прилагательные'},{lt:'raudonas / raudona',ru:'красный / красная',topic:'Прилагательные'},{lt:'žalias / žalia',ru:'зелёный / зелёная',topic:'Прилагательные'},{lt:'ilgas / ilga',ru:'длинный / длинная',topic:'Прилагательные'},{lt:'trumpas / trumpa',ru:'короткий / короткая',topic:'Прилагательные'},{lt:'šviežias / šviežia',ru:'свежий / свежая',topic:'Прилагательные'},{lt:'debesuotas / debesuota',ru:'облачный / облачная',topic:'Прилагательные'},
+];
+
+const TOPICS = ['Все', ...new Set(WORDS.map(w => w.topic))];
+let known = {};
+let currentTopic = 'Все';
+let currentFilter = 'all';
+let filtered = [];
+let idx = 0;
+let flipped = false;
+let currentUser = null;
+let isRegMode = false;
+let saveTimer = null;
+
+function getStorageKey(user) { return 'lt_known_' + user; }
+
+async function loadProgress(user) {
+  try {
+    const r = await window.storage.get(getStorageKey(user));
+    known = (r && r.value) ? JSON.parse(r.value) : {};
+  } catch(e) { known = {}; }
+}
+
+async function saveProgress() {
+  if (!currentUser) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try {
+      await window.storage.set(getStorageKey(currentUser), JSON.stringify(known));
+      setSyncStatus('saved');
+    } catch(e) { setSyncStatus('error'); }
+  }, 800);
+}
+
+function setSyncStatus(state) {
+  const el = document.getElementById('sync-status');
+  if (state === 'saved') {
+    el.innerHTML = '<i class="ti ti-cloud-check" style="color:var(--color-text-success)"></i> Сохранено';
+    setTimeout(() => { el.innerHTML = ''; }, 2500);
+  } else if (state === 'error') {
+    el.innerHTML = '<i class="ti ti-alert-circle" style="color:var(--color-text-danger)"></i> Ошибка сохранения';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+async function checkUser(name, pass) {
+  const key = 'lt_user_' + name;
+  try {
+    const r = await window.storage.get(key);
+    if (r && r.value) {
+      const data = JSON.parse(r.value);
+      return data.pass === pass ? 'ok' : 'wrong_pass';
+    }
+    return 'not_found';
+  } catch(e) { return 'not_found'; }
+}
+
+async function createUser(name, pass) {
+  const key = 'lt_user_' + name;
+  try {
+    const existing = await window.storage.get(key);
+    if (existing && existing.value) return 'exists';
+    await window.storage.set(key, JSON.stringify({ pass }));
+    return 'ok';
+  } catch(e) { return 'error'; }
+}
+
+async function doAuth() {
+  const name = document.getElementById('login-name').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  if (!name || name.length < 2) { err.textContent = 'Введите имя (минимум 2 символа)'; return; }
+  if (!pass || pass.length < 4) { err.textContent = 'Пароль должен быть не менее 4 символов'; return; }
+  const btn = document.getElementById('login-submit');
+  btn.textContent = '...';
+  err.textContent = '';
+  if (isRegMode) {
+    const res = await createUser(name, pass);
+    if (res === 'exists') { err.textContent = 'Пользователь уже существует'; }
+    else if (res === 'ok') { await loginAs(name); }
+    else { err.textContent = 'Ошибка. Попробуйте ещё раз.'; }
+  } else {
+    const res = await checkUser(name, pass);
+    if (res === 'ok') { await loginAs(name); }
+    else if (res === 'wrong_pass') { err.textContent = 'Неверный пароль'; }
+    else { err.textContent = 'Пользователь не найден. Зарегистрируйтесь.'; }
+  }
+  btn.textContent = isRegMode ? 'Зарегистрироваться' : 'Войти';
+}
+
+async function loginAs(name) {
+  currentUser = name;
+  await loadProgress(name);
+  updateAvatar();
+  showScreen('main');
+  refresh();
+  setSyncStatus('');
+}
+
+function doLogout() {
+  currentUser = null;
+  known = {};
+  updateAvatar();
+  showScreen('main');
+  refresh();
+}
+
+function updateAvatar() {
+  const av = document.getElementById('avatar-btn');
+  if (currentUser) {
+    av.textContent = currentUser.slice(0, 2).toUpperCase();
+    av.title = currentUser;
+    av.style.background = 'var(--color-background-success)';
+    av.style.color = 'var(--color-text-success)';
+  } else {
+    av.textContent = '?';
+    av.title = 'Войти';
+    av.style.background = 'var(--color-background-info)';
+    av.style.color = 'var(--color-text-info)';
+  }
+}
+
+function showProfile() {
+  if (!currentUser) { showScreen('login'); return; }
+  const totalKnown = WORDS.filter(w => known[w.lt]).length;
+  const pct = Math.round(totalKnown / WORDS.length * 100);
+  const topicsDone = TOPICS.slice(1).filter(t => {
+    const tw = WORDS.filter(w => w.topic === t);
+    return tw.length > 0 && tw.every(w => known[w.lt]);
+  }).length;
+  document.getElementById('prof-av').textContent = currentUser.slice(0, 2).toUpperCase();
+  document.getElementById('prof-name').textContent = currentUser;
+  document.getElementById('prof-id').textContent = 'Прогресс сохранён локально';
+  document.getElementById('prof-known').textContent = totalKnown;
+  document.getElementById('prof-total').textContent = WORDS.length;
+  document.getElementById('prof-pct').textContent = pct + '%';
+  document.getElementById('prof-topics').textContent = topicsDone;
+  showScreen('profile');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleMode() {
+  isRegMode = !isRegMode;
+  document.getElementById('login-title').textContent = isRegMode ? 'Регистрация' : 'Вход';
+  document.getElementById('login-submit').textContent = isRegMode ? 'Зарегистрироваться' : 'Войти';
+  document.getElementById('login-toggle').innerHTML = isRegMode
+    ? 'Уже есть аккаунт? <span onclick="toggleMode()">Войти</span>'
+    : 'Нет аккаунта? <span onclick="toggleMode()">Зарегистрироваться</span>';
+  document.getElementById('login-err').textContent = '';
+}
+
+function renderTopics() {
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = TOPICS.map(t => {
+    const cnt = t === 'Все' ? WORDS.length : WORDS.filter(w => w.topic === t).length;
+    const knownCnt = t === 'Все' ? WORDS.filter(w => known[w.lt]).length : WORDS.filter(w => w.topic === t && known[w.lt]).length;
+    const active = t === currentTopic ? ' active' : '';
+    return `<button class="topic-btn${active}" onclick="setTopic('${t.replace(/'/g, "\\'")}',this)">${t}<span class="t-cnt">${knownCnt}/${cnt}</span></button>`;
+  }).join('');
+}
+
+function setTopic(t, btn) {
+  currentTopic = t;
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  idx = 0; flipped = false; refresh();
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  idx = 0; flipped = false; refresh();
+}
+
+function getFiltered() {
+  return WORDS.filter(w => {
+    const topicOk = currentTopic === 'Все' || w.topic === currentTopic;
+    if (!topicOk) return false;
+    if (currentFilter === 'known') return known[w.lt];
+    if (currentFilter === 'learning') return !known[w.lt];
+    return true;
+  });
+}
+
+function refresh() {
+  filtered = getFiltered();
+  const totalKnown = WORDS.filter(w => known[w.lt]).length;
+  document.getElementById('stat-k').textContent = totalKnown + ' знаю';
+  document.getElementById('stat-l').textContent = (WORDS.length - totalKnown) + ' учу';
+  const pct = WORDS.length ? Math.round(totalKnown / WORDS.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-lbl').textContent = 'Изучено: ' + pct + '% (' + totalKnown + '/' + WORDS.length + ')';
+  renderTopics();
+  if (idx >= filtered.length) idx = 0;
+  showCard();
+}
+
+function showCard() {
+  const card = filtered[idx];
+  document.getElementById('nav-ctr').textContent = filtered.length ? (idx + 1) + ' / ' + filtered.length : '0 / 0';
+  if (!card) {
+    document.getElementById('w-lt').textContent = '—';
+    document.getElementById('w-ru').textContent = 'Нет карточек';
+    document.getElementById('w-forms').textContent = '';
+    document.getElementById('w-ru-sub').textContent = '';
+    document.getElementById('w-tag').textContent = '';
+    document.getElementById('w-tag2').textContent = '';
+    document.getElementById('known-badge').innerHTML = '';
+    return;
+  }
+  document.getElementById('w-lt').textContent = card.lt;
+  document.getElementById('w-ru').textContent = card.ru;
+  document.getElementById('w-forms').textContent = card.sub || '';
+  document.getElementById('w-ru-sub').textContent = card.sub || '';
+  document.getElementById('w-tag').textContent = card.topic;
+  document.getElementById('w-tag2').textContent = card.topic;
+  document.getElementById('known-badge').innerHTML = known[card.lt] ? '<span class="known-badge"><i class="ti ti-check"></i> Знаю</span>' : '';
+  document.getElementById('card-inner').classList.remove('flipped');
+  flipped = false;
+}
+
+function flipCard() {
+  document.getElementById('card-inner').classList.toggle('flipped');
+  flipped = !flipped;
+}
+
+function nextCard() { if (!filtered.length) return; idx = (idx + 1) % filtered.length; flipped = false; refresh(); }
+function prevCard() { if (!filtered.length) return; idx = (idx - 1 + filtered.length) % filtered.length; flipped = false; refresh(); }
+
+function markCard(isKnown) {
+  const card = filtered[idx];
+  if (!card) return;
+  known[card.lt] = isKnown;
+  if (currentUser) saveProgress();
+  nextCard();
+}
+
+// ── Touch / swipe handling ──
+(function() {
+  const wrap = document.getElementById('card-wrap');
+  let startX = 0, startY = 0, startTime = 0;
+  let isSwipe = false, touchHandled = false;
+  let lastTouchFlip = 0;
+
+  wrap.addEventListener('touchstart', function(e) {
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    startTime = Date.now();
+    isSwipe = false;
+    touchHandled = false;
+  }, { passive: true });
+
+  wrap.addEventListener('touchmove', function(e) {
+    const t = e.touches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+      isSwipe = true;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  wrap.addEventListener('touchend', function(e) {
+    if (touchHandled) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    const dt = Date.now() - startTime;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (!isSwipe && absDx < 15 && absDy < 15 && dt < 500) {
+      e.preventDefault(); // suppress iOS ghost click that follows touchend
+      lastTouchFlip = Date.now();
+      touchHandled = true;
+      flipCard();
+      return;
+    }
+
+    if (isSwipe && absDx > 50 && absDx > absDy * 1.5) {
+      touchHandled = true;
+      if (dx < 0) nextCard();
+      else prevCard();
+    }
+  }, { passive: false });
+
+  wrap.addEventListener('touchcancel', function() {
+    isSwipe = false;
+    touchHandled = false;
+  }, { passive: true });
+
+  // Mouse click (desktop only); timestamp guard prevents double-flip from iOS ghost clicks
+  wrap.addEventListener('click', function() {
+    if (Date.now() - lastTouchFlip < 600) return;
+    flipCard();
+  });
+})();
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
+document.getElementById('login-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
+
+
+function renderTopics() {
+  const sel = document.getElementById('topic-select');
+  if(!sel) return;
+  sel.innerHTML = TOPICS.map(t => `<option value="${t}" ${t===currentTopic?'selected':''}>${t}</option>`).join('');
+}
+document.addEventListener('change', function(e){
+  if(e.target && e.target.id==='topic-select'){
+    currentTopic = e.target.value;
+    idx = 0;
+    flipped = false;
+    refresh();
+  }
+});
+refresh();
+
+</script>
+</body>
+</html>
