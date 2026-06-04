@@ -398,14 +398,38 @@ font-weight:600;
 }
 #searchInput{
   width:100%;
-  padding:12px;
+  padding:12px 44px 12px 16px;
   border:1px solid var(--color-border-secondary);
-  border-radius:12px;
+  border-radius:16px;
   font-size:16px;
-  margin:12px 0;
   background:var(--color-background-primary);
   color:var(--color-text-primary);
+  box-sizing:border-box;
 }
+#searchInput:focus::placeholder{
+  color:transparent;
+} 
+.search-wrap{
+  position:relative;
+}
+
+#clearSearch{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-size:18px;
+  color:#888;
+  display:none;
+  padding:4px;
+}
+
+#clearSearch:hover{
+  color:#fff;
+}    
 </style>
 </head>
 <body>
@@ -439,12 +463,23 @@ font-weight:600;
   </div>
 
 </div>
-<input
-  id="searchInput"
-  type="text"
-  placeholder="🔍 Поиск по литовскому или русскому..."
-  oninput="searchWords()"
-/>
+<div class="search-wrap">
+
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="🔍 Поиск по литовскому или русскому..."
+    oninput="searchWords()"
+  >
+
+  <button
+    id="clearSearch"
+    onclick="clearSearch()"
+  >
+    ✕
+  </button>
+
+</div>
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
       <button class="filter-btn" onclick="setFilter('learning',this)">Учу</button>
@@ -1287,13 +1322,28 @@ let saveTimer = null;
 let searchText = '';
 
 function searchWords() {
+
   searchText = document
     .getElementById('searchInput')
     .value
     .toLowerCase();
 
+  document.getElementById('clearSearch').style.display =
+    searchText ? 'block' : 'none';
+
   refresh();
 }
+  
+function clearSearch(){
+
+  document.getElementById('searchInput').value = '';
+
+  searchText = '';
+
+  document.getElementById('clearSearch').style.display = 'none';
+
+  refresh();
+}  
 
 function getStorageKey(user) { return 'lt_known_' + user; }
 
