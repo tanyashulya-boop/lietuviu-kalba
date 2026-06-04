@@ -526,6 +526,13 @@ font-weight:600;
   <button class="filter-btn" onclick="setFilter('known',this)">
     Знаю
   </button>
+  <button
+  id="lang-mode-btn"
+  class="filter-btn"
+  onclick="toggleMode()"
+>
+  LT | RU
+</button>
 </div>
 
     <div class="prog-wrap">
@@ -537,7 +544,7 @@ font-weight:600;
       <div class="card-wrap" id="card-wrap">
         <div class="card-inner" id="card-inner">
           <div class="card-face card-front">
-            <span class="c-lang">Литовский</span>
+            <span class="c-lang" id="front-lang">Литовский</span>
             <div class="c-word" id="w-lt"></div>
             <div class="c-sub" id="w-forms"></div>
             <span class="c-tag" id="w-tag"></span>
@@ -545,7 +552,7 @@ font-weight:600;
             <span class="c-hint">нажмите, чтобы перевернуть</span>
           </div>
           <div class="card-face card-back">
-            <span class="c-lang">Русский</span>
+            <span class="c-lang" id="back-lang">Русский</span>
             <div class="c-word" id="w-ru"></div>
             <div class="c-sub" id="w-ru-sub"></div>
             <span class="c-tag" id="w-tag2"></span>
@@ -1372,6 +1379,7 @@ let currentFilter = 'all';
 let filtered = [];
 let idx = 0;
 let flipped = false;
+let reverseMode = false;
 let currentUser = null;
 let isRegMode = false;
 let saveTimer = null;
@@ -1793,6 +1801,27 @@ function refresh() {
   showCard();
 }
 
+ function toggleMode(){
+
+  reverseMode = !reverseMode;
+
+  document.getElementById('lang-mode-btn').textContent =
+    reverseMode
+      ? 'RU | LT'
+      : 'LT | RU';
+
+  document.getElementById('front-lang').textContent =
+    reverseMode
+      ? 'Русский'
+      : 'Литовский';
+
+  document.getElementById('back-lang').textContent =
+    reverseMode
+      ? 'Литовский'
+      : 'Русский';
+
+  showCard();
+} 
 function showCard() {
   const card = filtered[idx];
   const status = document.getElementById('card-status');
@@ -1830,8 +1859,17 @@ else {
   status.className = "status-learning";
 }
   document.getElementById('nav-ctr').textContent = filtered.length ? (idx + 1) + ' / ' + filtered.length : '0 / 0';
+  if (reverseMode) {
+
+  document.getElementById('w-lt').textContent = card.ru;
+  document.getElementById('w-ru').textContent = card.lt;
+
+} else {
+
   document.getElementById('w-lt').textContent = card.lt;
   document.getElementById('w-ru').textContent = card.ru;
+
+}
   document.getElementById('w-forms').textContent = card.sub || '';
   document.getElementById('w-ru-sub').textContent = card.sub || '';
   document.getElementById('w-tag').textContent = card.topic;
