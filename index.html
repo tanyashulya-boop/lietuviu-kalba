@@ -525,11 +525,23 @@ font-weight:600;
       <button class="btn-a btn-known" onclick="markCard(true)"><i class="ti ti-check" aria-hidden="true"></i>Знаю</button>
     </div>
 
-    <div class="nav-row">
-      <button class="nav-btn" onclick="prevCard()" aria-label="Назад"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
-      <span class="nav-ctr" id="nav-ctr">— / —</span>
-      <button class="nav-btn" onclick="nextCard()" aria-label="Вперёд"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
-    </div>
+   <div class="nav-row">
+
+  <button class="nav-btn" onclick="prevCard()" aria-label="Назад">
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
+  </button>
+
+  <button class="nav-btn" onclick="randomCard()" aria-label="Случайная карточка">
+    🎲
+  </button>
+
+  <span class="nav-ctr" id="nav-ctr"></span>
+
+  <button class="nav-btn" onclick="nextCard()" aria-label="Вперёд">
+    <i class="ti ti-arrow-right" aria-hidden="true"></i>
+  </button>
+
+</div>
 
     <div class="swipe-hint">← смахните для перехода →</div>
   </div>
@@ -1318,6 +1330,7 @@ const WORDS = [
 
 const TOPICS = ['Все', ...new Set(WORDS.map(w => w.topic))];
 let known = {};
+let difficult = {};
 let currentTopic = 'Все';
 let currentFilter = 'all';
 let filtered = [];
@@ -1757,6 +1770,18 @@ function flipCard() {
 
 function nextCard() { if (!filtered.length) return; idx = (idx + 1) % filtered.length; flipped = false; refresh(); }
 function prevCard() { if (!filtered.length) return; idx = (idx - 1 + filtered.length) % filtered.length; flipped = false; refresh(); }
+function randomCard(){
+
+  if(!filtered.length) return;
+
+  idx = Math.floor(
+    Math.random() * filtered.length
+  );
+
+  flipped = false;
+
+  refresh();
+}  
 
 function markCard(isKnown) {
   const card = filtered[idx];
