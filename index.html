@@ -1286,6 +1286,15 @@ let isRegMode = false;
 let saveTimer = null;
 let searchText = '';
 
+function searchWords() {
+  searchText = document
+    .getElementById('searchInput')
+    .value
+    .toLowerCase();
+
+  refresh();
+}
+
 function getStorageKey(user) { return 'lt_known_' + user; }
 
 async function loadProgress(user) {
