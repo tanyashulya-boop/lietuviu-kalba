@@ -163,6 +163,11 @@
       touch-action: manipulation; white-space: nowrap; flex-shrink: 0;
       font-family: inherit;
     }
+    #lang-mode-btn{
+  padding:7px 8px;
+  min-width:55px;
+  font-size:11px;
+}
     .filter-btn.active {
       border-color: var(--color-border-primary);
       color: var(--color-text-primary); font-weight: 600;
@@ -531,7 +536,7 @@ font-weight:600;
   class="filter-btn"
   onclick="toggleMode()"
 >
-  LT | RU
+LT⇄RU
 </button>
 </div>
 
@@ -1807,8 +1812,8 @@ function refresh() {
 
   document.getElementById('lang-mode-btn').textContent =
     reverseMode
-      ? 'RU | LT'
-      : 'LT | RU';
+     ? 'RU⇄LT'
+     : 'LT⇄RU';
 
   document.getElementById('front-lang').textContent =
     reverseMode
