@@ -1794,6 +1794,26 @@ function refresh() {
 function showCard() {
   const card = filtered[idx];
   const status = document.getElementById('card-status');
+  if (!card) {
+
+  document.getElementById('w-lt').textContent = '🎉';
+  document.getElementById('w-ru').textContent =
+    currentFilter === 'difficult'
+      ? 'Нет трудных слов'
+      : 'Нет карточек';
+
+  document.getElementById('w-forms').textContent = '';
+  document.getElementById('w-ru-sub').textContent = '';
+  document.getElementById('w-tag').textContent = '';
+  document.getElementById('w-tag2').textContent = '';
+  document.getElementById('known-badge').innerHTML = '';
+
+  document.getElementById('nav-ctr').textContent = '0 / 0';
+
+  status.textContent = '';
+
+  return;
+}
 
 if (known[card.lt] === true) {
   status.textContent = "✓ Знаю";
@@ -1808,16 +1828,6 @@ else {
   status.className = "status-learning";
 }
   document.getElementById('nav-ctr').textContent = filtered.length ? (idx + 1) + ' / ' + filtered.length : '0 / 0';
-  if (!card) {
-    document.getElementById('w-lt').textContent = '—';
-    document.getElementById('w-ru').textContent = 'Нет карточек';
-    document.getElementById('w-forms').textContent = '';
-    document.getElementById('w-ru-sub').textContent = '';
-    document.getElementById('w-tag').textContent = '';
-    document.getElementById('w-tag2').textContent = '';
-    document.getElementById('known-badge').innerHTML = '';
-    return;
-  }
   document.getElementById('w-lt').textContent = card.lt;
   document.getElementById('w-ru').textContent = card.ru;
   document.getElementById('w-forms').textContent = card.sub || '';
