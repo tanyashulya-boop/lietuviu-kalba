@@ -143,10 +143,14 @@
 
     /* ── Filter row ── */
     .filter-row {
-      display: flex; gap: 6px; padding: 0 1rem 0.5rem;
-      overflow-x: auto; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
+  display:flex;
+  gap:6px;
+  padding:0 1rem 0.5rem;
+  margin-top:16px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
     .filter-row::-webkit-scrollbar { display: none; }
 
     .filter-btn {
@@ -417,7 +421,7 @@ font-weight:600;
 } 
 .search-wrap{
   position:relative;
-  margin:0 1rem 14px 1rem;
+  margin:0 1rem 18px 1rem;
 }
 
 #clearSearch{
@@ -485,6 +489,8 @@ font-weight:600;
   >
     ✕
   </button>
+  
+ </div>
 
 <div class="filter-row">
   <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
