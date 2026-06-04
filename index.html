@@ -396,7 +396,16 @@ font-weight:500;
 color:#6B7280;
 font-weight:600;
 }
-
+#searchInput{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--color-border-secondary);
+  border-radius:12px;
+  font-size:16px;
+  margin:12px 0;
+  background:var(--color-background-primary);
+  color:var(--color-text-primary);
+}
 </style>
 </head>
 <body>
@@ -430,7 +439,12 @@ font-weight:600;
   </div>
 
 </div>
-
+<input
+  id="searchInput"
+  type="text"
+  placeholder="🔍 Поиск по литовскому или русскому..."
+  oninput="searchWords()"
+/>
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
       <button class="filter-btn" onclick="setFilter('learning',this)">Учу</button>
@@ -1270,6 +1284,7 @@ let flipped = false;
 let currentUser = null;
 let isRegMode = false;
 let saveTimer = null;
+let searchText = '';
 
 function getStorageKey(user) { return 'lt_known_' + user; }
 
@@ -1509,10 +1524,25 @@ function setFilter(f, btn) {
 
 function getFiltered() {
   return WORDS.filter(w => {
-    const topicOk = currentTopic === 'Все' || w.topic === currentTopic;
+
+    const topicOk =
+      currentTopic === 'Все' ||
+      w.topic === currentTopic;
+
     if (!topicOk) return false;
+
+    if (searchText) {
+
+      const found =
+        w.lt.toLowerCase().includes(searchText) ||
+        w.ru.toLowerCase().includes(searchText);
+
+      if (!found) return false;
+    }
+
     if (currentFilter === 'known') return known[w.lt];
     if (currentFilter === 'learning') return !known[w.lt];
+
     return true;
   });
 }
